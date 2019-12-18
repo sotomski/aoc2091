@@ -8,50 +8,54 @@ fun main() {
     println("Result: $result")
 }
 
+const val OP_HALT = 99
+const val OP_ADD = 1
+const val OP_MULT = 2
+
 fun executeIntcode(initialMemory: ArrayList<Int>, noun: Int, verb: Int): Int {
     // Initialize memory
     val memory = ArrayList(initialMemory)
     memory[1] = noun
     memory[2] = verb
 
-    var cursor = 0
-    fun firstOperandPosition() = memory[cursor + 1]
-    fun secondOperandPosition() = memory[cursor + 2]
-    fun resultPosition() = memory[cursor + 3]
+    var instructionPointer = 0
+    fun firstParamAddress() = memory[instructionPointer + 1]
+    fun secondParamAddress() = memory[instructionPointer + 2]
+    fun resultAddress() = memory[instructionPointer + 3]
 
-    var operation = 0
+    var opcode = 0
     var firstOperand = 0
     var secondOperand = 0
     var result = 0
 
     println("===> EXECUTING PROGRAM: $memory")
 
-    loop@ while(operation != 99) {
+    loop@ while(opcode != OP_HALT) {
 //        println("Iteration start: $memory")
 
-        // TODO: Read values
-        operation = memory[cursor]
+        // Read values
+        opcode = memory[instructionPointer]
 
-        // TODO: Perform operation
-        result = when(operation) {
-            1 -> {
-                firstOperand = memory[firstOperandPosition()]
-                secondOperand = memory[secondOperandPosition()]
+        // Perform operation
+        result = when(opcode) {
+            OP_ADD -> {
+                firstOperand = memory[firstParamAddress()]
+                secondOperand = memory[secondParamAddress()]
                 firstOperand + secondOperand
             }
-            2 -> {
-                firstOperand = memory[firstOperandPosition()]
-                secondOperand = memory[secondOperandPosition()]
+            OP_MULT -> {
+                firstOperand = memory[firstParamAddress()]
+                secondOperand = memory[secondParamAddress()]
                 firstOperand * secondOperand
             }
-            99 -> break@loop
+            OP_HALT -> break@loop
             else -> throw UnsupportedOperationException()
         }
 
-        memory[resultPosition()] = result
+        memory[resultAddress()] = result
 
-        // TODO: Step forward (update positions)
-        cursor += 4
+        // Step forward
+        instructionPointer += 4
 
 //        println("Iteration end: $memory")
 
