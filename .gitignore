@@ -1,2 +1,7 @@
 /adventofcode2019.iml
 /out/production/adventofcode2019/
+/.gradle/
+/build/
+/gradle/wrapper/
+/gradlew
+/gradlew.bat
