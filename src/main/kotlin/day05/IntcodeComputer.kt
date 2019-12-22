@@ -1,6 +1,15 @@
 package day05
 
+import java.util.*
+import kotlin.collections.ArrayList
+
 class IntcodeComputer {
+
+    private val inputBuffer: Queue<Int> = ArrayDeque()
+
+    fun registerInput(value: Int) {
+        inputBuffer.add(value)
+    }
 
     fun execute(initialMemory: List<Int>, noun: Int? = null, verb: Int? = null): Int {
         // Initialize memory
@@ -9,49 +18,42 @@ class IntcodeComputer {
         verb?.let { memory[2] = it }
 
         var instructionPointer = 0
-        fun firstParamAddress() = memory[instructionPointer + 1]
-        fun secondParamAddress() = memory[instructionPointer + 2]
-        fun resultAddress() = memory[instructionPointer + 3]
 
         var opcode = 0
-        var firstOperand = 0
-        var secondOperand = 0
-        var result = 0
+        var resultAddress = 0
 
-//    println("===> EXECUTING PROGRAM: $memory")
-
-        loop@ while(opcode != Companion.OP_HALT) {
-//        println("Iteration start: $memory")
-
-            // Read values
+        loop@ while(opcode != OP_HALT) {
             opcode = memory[instructionPointer]
 
-            // Perform operation
-            result = when(opcode) {
-                Companion.OP_ADD -> {
-                    firstOperand = memory[firstParamAddress()]
-                    secondOperand = memory[secondParamAddress()]
+            val result = when(opcode) {
+                OP_ADD -> {
+                    val firstOperand = memory[memory[instructionPointer + 1]]
+                    val secondOperand = memory[memory[instructionPointer + 2]]
+                    resultAddress = memory[instructionPointer + 3]
+                    instructionPointer += 4
+
                     firstOperand + secondOperand
                 }
-                Companion.OP_MULT -> {
-                    firstOperand = memory[firstParamAddress()]
-                    secondOperand = memory[secondParamAddress()]
+                OP_MULT -> {
+                    val firstOperand = memory[memory[instructionPointer + 1]]
+                    val secondOperand = memory[memory[instructionPointer + 2]]
+                    resultAddress = memory[instructionPointer + 3]
+                    instructionPointer += 4
+
                     firstOperand * secondOperand
                 }
-                Companion.OP_HALT -> break@loop
+                OP_INPUT -> {
+                    resultAddress = memory[instructionPointer + 1]
+                    instructionPointer += 2
+
+                    inputBuffer.poll()
+                }
+                OP_HALT -> break@loop
                 else -> throw UnsupportedOperationException()
             }
 
-            memory[resultAddress()] = result
-
-            // Step forward
-            instructionPointer += 4
-
-//        println("Iteration end: $memory")
-
+            memory[resultAddress] = result
         }
-
-//    println("===> FINISHED EXECUTION")
 
         return memory[0]
     }
@@ -60,5 +62,6 @@ class IntcodeComputer {
         const val OP_HALT = 99
         const val OP_ADD = 1
         const val OP_MULT = 2
+        const val OP_INPUT = 3
     }
 }
