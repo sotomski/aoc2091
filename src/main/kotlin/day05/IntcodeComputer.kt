@@ -1,11 +1,11 @@
 package day05
 
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.math.pow
 
-class IntcodeComputer {
+class IntcodeComputer(initialMemory: List<Int>) {
 
+    private val sharedMemory = mutableListOf(*initialMemory.toTypedArray())
     private val inputBuffer: Queue<Int> = ArrayDeque()
     private val outputBuffer = mutableListOf<Int>()
 
@@ -15,11 +15,10 @@ class IntcodeComputer {
         inputBuffer.add(value)
     }
 
-    fun execute(initialMemory: List<Int>, noun: Int? = null, verb: Int? = null): Int {
+    fun execute(noun: Int? = null, verb: Int? = null): Int {
         // Initialize memory
-        val memory = ArrayList(initialMemory)
-        noun?.let { memory[1] = it }
-        verb?.let { memory[2] = it }
+        noun?.let { sharedMemory[1] = it }
+        verb?.let { sharedMemory[2] = it }
 
         var instructionPointer = 0
 
@@ -27,68 +26,68 @@ class IntcodeComputer {
         var resultAddress = 0
 
         loop@ while(opcode != OP_HALT) {
-            opcode = memory[instructionPointer] % 100
-            val paramModes = memory[instructionPointer] / 100
+            opcode = sharedMemory[instructionPointer] % 100
+            val paramModes = sharedMemory[instructionPointer] / 100
 
             when(opcode) {
                 OP_ADD -> {
                     val firstOperandPosition = if (paramModes / 10.0.pow(1-1).toInt() % 10 == 0) {
-                        memory[instructionPointer + 1]
+                        sharedMemory[instructionPointer + 1]
                     } else {
                         instructionPointer + 1
                     }
-                    val firstOperand = memory[firstOperandPosition]
+                    val firstOperand = sharedMemory[firstOperandPosition]
 
                     val secondOperandPosition = if (paramModes / 10.0.pow(2-1).toInt() % 10 == 0) {
-                        memory[instructionPointer + 2]
+                        sharedMemory[instructionPointer + 2]
                     } else {
                         instructionPointer + 2
                     }
-                    val secondOperand = memory[secondOperandPosition]
+                    val secondOperand = sharedMemory[secondOperandPosition]
 
-                    resultAddress = memory[instructionPointer + 3]
+                    resultAddress = sharedMemory[instructionPointer + 3]
                     instructionPointer += 4
 
-                    memory[resultAddress] = firstOperand + secondOperand
+                    sharedMemory[resultAddress] = firstOperand + secondOperand
                 }
                 OP_MULT -> {
                     val firstOperandPosition = if (paramModes / 10.0.pow(1-1).toInt() % 10 == 0) {
-                        memory[instructionPointer + 1]
+                        sharedMemory[instructionPointer + 1]
                     } else {
                         instructionPointer + 1
                     }
-                    val firstOperand = memory[firstOperandPosition]
+                    val firstOperand = sharedMemory[firstOperandPosition]
 
                     val secondOperandPosition = if (paramModes / 10.0.pow(2-1).toInt() % 10 == 0) {
-                        memory[instructionPointer + 2]
+                        sharedMemory[instructionPointer + 2]
                     } else {
                         instructionPointer + 2
                     }
-                    val secondOperand = memory[secondOperandPosition]
+                    val secondOperand = sharedMemory[secondOperandPosition]
 
-                    resultAddress = memory[instructionPointer + 3]
+                    resultAddress = sharedMemory[instructionPointer + 3]
                     instructionPointer += 4
 
-                    memory[resultAddress] = firstOperand * secondOperand
+                    sharedMemory[resultAddress] = firstOperand * secondOperand
                 }
                 OP_INPUT -> {
                     resultAddress = if (paramModes / 10.0.pow(1-1).toInt() % 10 == 0) {
-                        memory[instructionPointer + 1]
+                        sharedMemory[instructionPointer + 1]
                     } else {
                         instructionPointer + 1
                     }
 
                     instructionPointer += 2
 
-                    memory[resultAddress] = inputBuffer.poll()
+                    sharedMemory[resultAddress] = inputBuffer.poll()
                 }
                 OP_OUTPUT -> {
                     val firstOperandPosition = if (paramModes / 10.0.pow(1-1).toInt() % 10 == 0) {
-                        memory[instructionPointer + 1]
+                        sharedMemory[instructionPointer + 1]
                     } else {
                         instructionPointer + 1
                     }
-                    val firstOperand = memory[firstOperandPosition]
+                    val firstOperand = sharedMemory[firstOperandPosition]
                     instructionPointer += 2
 
                     outputBuffer.add(firstOperand)
@@ -98,7 +97,7 @@ class IntcodeComputer {
             }
         }
 
-        return memory[0]
+        return sharedMemory[0]
     }
 
     companion object {

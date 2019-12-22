@@ -5,9 +5,9 @@ fun main() {
 
     val initialMemory = rawInput.split(',').map { it.toInt() }
 
-    val computer = IntcodeComputer()
+    val computer = IntcodeComputer(initialMemory)
     computer.registerInput(1)
-    computer.execute(initialMemory)
+    computer.execute()
 
     println("Part 1: Computer output: ${computer.output()}")
 }

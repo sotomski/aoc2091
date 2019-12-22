@@ -16,11 +16,11 @@ class IntcodeComputerTest {
     fun `ADD in default positional mode`() {
         assertEquals(
             3,
-            IntcodeComputer().execute(listOf(ADD, 2, 1, 0, 99))
+            IntcodeComputer(listOf(ADD, 2, 1, 0, 99)).execute()
         )
         assertEquals(
             3 * 99,
-            IntcodeComputer().execute(listOf(ADD, 8, 8, 0, ADD, 0, 8, 0, 99))
+            IntcodeComputer(listOf(ADD, 8, 8, 0, ADD, 0, 8, 0, 99)).execute()
         )
     }
 
@@ -30,7 +30,7 @@ class IntcodeComputerTest {
 
         assertEquals(
             1008,
-            IntcodeComputer().execute(listOf(opcode, 0, 7, 0, 99))
+            IntcodeComputer(listOf(opcode, 0, 7, 0, 99)).execute()
         )
     }
 
@@ -38,11 +38,11 @@ class IntcodeComputerTest {
     fun `MULT in default positional mode`() {
         assertEquals(
             2,
-            IntcodeComputer().execute(listOf(MULT, 2, 1, 0, 99))
+            IntcodeComputer(listOf(MULT, 2, 1, 0, 99)).execute()
         )
         assertEquals(
             99.0.pow(3.0).toInt(),
-            IntcodeComputer().execute(listOf(MULT, 8, 8, 0, MULT, 0, 8, 0, 99))
+            IntcodeComputer(listOf(MULT, 8, 8, 0, MULT, 0, 8, 0, 99)).execute()
         )
     }
 
@@ -52,7 +52,7 @@ class IntcodeComputerTest {
 
         assertEquals(
             20,
-            IntcodeComputer().execute(listOf(opcode, 5, 4, 0, 99))
+            IntcodeComputer(listOf(opcode, 5, 4, 0, 99)).execute()
         )
     }
 
@@ -62,26 +62,26 @@ class IntcodeComputerTest {
 
         assertEquals(
             90,
-            IntcodeComputer().execute(listOf(opcode, -11, 0, 0, 99))
+            IntcodeComputer(listOf(opcode, -11, 0, 0, 99)).execute()
         )
     }
 
     @Test
     fun `INPUT operation`() {
-        val computer = IntcodeComputer()
+        val computer = IntcodeComputer(listOf(INPUT, 0, 99))
 
         computer.registerInput(42)
-        val got = computer.execute(listOf(INPUT, 0, 99))
+        val got = computer.execute()
 
         assertEquals(    42, got)
     }
 
     @Test
     fun `INPUT operation in immediate mode`() {
-        val computer = IntcodeComputer()
+        val computer = IntcodeComputer(listOf(INPUT + 100, 0, OUTPUT, 1, 99))
 
         computer.registerInput(42)
-        computer.execute(listOf(INPUT + 100, 0, OUTPUT, 1, 99))
+        computer.execute()
         val got = computer.output().last()
 
         assertEquals(    42, got)
@@ -89,18 +89,18 @@ class IntcodeComputerTest {
 
     @Test
     fun `OUTPUT operation`() {
-        val computer = IntcodeComputer()
+        val computer = IntcodeComputer(listOf(INPUT, 0, OUTPUT, 0, 99))
 
         computer.registerInput(42)
-        computer.execute(listOf(INPUT, 0, OUTPUT, 0, 99))
+        computer.execute()
 
         assertEquals(42, computer.output().last())
     }
 
     @Test
     fun `OUTPUT operation in immediate mode`() {
-        val computer = IntcodeComputer().apply {
-            execute(listOf(OUTPUT + 100, -57, 99))
+        val computer = IntcodeComputer(listOf(OUTPUT + 100, -57, 99)).apply {
+            execute()
         }
 
         assertEquals(-57, computer.output().last())
