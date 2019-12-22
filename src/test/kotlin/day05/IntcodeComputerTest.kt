@@ -10,6 +10,7 @@ private const val MULT = 2
 private const val INPUT = 3
 private const val OUTPUT = 4
 private const val JUMP_IF_TRUE = 5
+private const val JUMP_IF_FALSE = 6
 
 class IntcodeComputerTest {
 
@@ -108,9 +109,34 @@ class IntcodeComputerTest {
     }
 
     @Test
-    fun `JUMP-IF-TRUE operation`() {
-        val computer = IntcodeComputer(listOf(JUMP_IF_TRUE, 1, 3, 4, 99))
+    fun `JUMP-IF-TRUE should jump if when param is non-zero`() {
+        val opcode = JUMP_IF_TRUE + 1000
+        val computer = IntcodeComputer(listOf(opcode, 1, 4, 44444, 99))
 
-        assertEquals(JUMP_IF_TRUE, computer.execute())
+        assertEquals(opcode, computer.execute())
+    }
+
+    @Test
+    fun `JUMP-IF-TRUE should do nothing when first param is zero`() {
+        val opcode = JUMP_IF_TRUE + 1100
+        val computer = IntcodeComputer(listOf(opcode, 0, 44444, 99))
+
+        assertEquals(opcode, computer.execute())
+    }
+
+    @Test
+    fun `JUMP-IF-FALSE should jump if when param is zero`() {
+        val opcode = JUMP_IF_FALSE + 1100
+        val computer = IntcodeComputer(listOf(opcode, 0, 4, 44444, 99))
+
+        assertEquals(opcode, computer.execute())
+    }
+
+    @Test
+    fun `JUMP-IF-FALSE should do nothing when first param is non-zero`() {
+        val opcode = JUMP_IF_FALSE + 1000
+        val computer = IntcodeComputer(listOf(opcode, 1, 44444, 99))
+
+        assertEquals(opcode, computer.execute())
     }
 }
