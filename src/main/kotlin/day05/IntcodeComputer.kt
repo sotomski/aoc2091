@@ -6,6 +6,8 @@ import kotlin.math.pow
 class IntcodeComputer(initialMemory: List<Int>) {
 
     private val sharedMemory = mutableListOf(*initialMemory.toTypedArray())
+    private var instructionPointer = 0
+
     private val inputBuffer: Queue<Int> = ArrayDeque()
     private val outputBuffer = mutableListOf<Int>()
 
@@ -15,16 +17,14 @@ class IntcodeComputer(initialMemory: List<Int>) {
         inputBuffer.add(value)
     }
 
-    private fun readOpcode(instructionPointer: Int) = sharedMemory[instructionPointer] % 100
+    private fun readOpcode() = sharedMemory[instructionPointer] % 100
 
-    // TODO: instructionPointer can be a field class that gets incremented on every opcode read and param read.
-    // TODO: This way is not necessary to count the offset for positions of parameters (ie. it's simply current position of the pointer).
-    private fun readParam(position: Int, instructionPointer: Int): Int {
+    private fun readValue(offset: Int): Int {
         val paramModes = sharedMemory[instructionPointer] / 100
-        val valueAddress = if (paramModes / 10.0.pow(position - 1).toInt() % 10 == 0) {
-            sharedMemory[instructionPointer + position]
+        val valueAddress = if (paramModes / 10.0.pow(offset - 1).toInt() % 10 == 0) {
+            sharedMemory[instructionPointer + offset]
         } else {
-            instructionPointer + position
+            instructionPointer + offset
         }
 
         return sharedMemory[valueAddress]
@@ -34,17 +34,13 @@ class IntcodeComputer(initialMemory: List<Int>) {
         noun?.let { sharedMemory[1] = it }
         verb?.let { sharedMemory[2] = it }
 
-        var instructionPointer = 0
-
         var resultAddress = 0
 
-        loop@ while(readOpcode(instructionPointer) != OP_HALT) {
-            val paramModes = sharedMemory[instructionPointer] / 100
-
-            when(readOpcode(instructionPointer)) {
+        loop@ while(true) {
+            when(readOpcode()) {
                 OP_ADD -> {
-                    val firstOperand = readParam(1, instructionPointer)
-                    val secondOperand = readParam(2, instructionPointer)
+                    val firstOperand = readValue(1)
+                    val secondOperand = readValue(2)
 
                     // TODO: Can this case be handled as standard parameter with omitted leading 0?
                     resultAddress = sharedMemory[instructionPointer + 3]
@@ -53,8 +49,8 @@ class IntcodeComputer(initialMemory: List<Int>) {
                     sharedMemory[resultAddress] = firstOperand + secondOperand
                 }
                 OP_MULT -> {
-                    val firstOperand = readParam(1, instructionPointer)
-                    val secondOperand = readParam(2, instructionPointer)
+                    val firstOperand = readValue(1)
+                    val secondOperand = readValue(2)
 
                     resultAddress = sharedMemory[instructionPointer + 3]
                     instructionPointer += 4
@@ -73,7 +69,7 @@ class IntcodeComputer(initialMemory: List<Int>) {
                     sharedMemory[resultAddress] = inputBuffer.poll()
                 }
                 OP_OUTPUT -> {
-                    val firstOperand = readParam(1, instructionPointer)
+                    val firstOperand = readValue(1)
                     instructionPointer += 2
 
                     outputBuffer.add(firstOperand)
