@@ -15,55 +15,46 @@ class IntcodeComputer(initialMemory: List<Int>) {
         inputBuffer.add(value)
     }
 
+    private fun readOpcode(instructionPointer: Int) = sharedMemory[instructionPointer] % 100
+
+    // TODO: instructionPointer can be a field class that gets incremented on every opcode read and param read.
+    // TODO: This way is not necessary to count the offset for positions of parameters (ie. it's simply current position of the pointer).
+    private fun readParam(position: Int, instructionPointer: Int): Int {
+        val paramModes = sharedMemory[instructionPointer] / 100
+        val valueAddress = if (paramModes / 10.0.pow(position - 1).toInt() % 10 == 0) {
+            sharedMemory[instructionPointer + position]
+        } else {
+            instructionPointer + position
+        }
+
+        return sharedMemory[valueAddress]
+    }
+
     fun execute(noun: Int? = null, verb: Int? = null): Int {
-        // Initialize memory
         noun?.let { sharedMemory[1] = it }
         verb?.let { sharedMemory[2] = it }
 
         var instructionPointer = 0
 
-        var opcode = 0
         var resultAddress = 0
 
-        loop@ while(opcode != OP_HALT) {
-            opcode = sharedMemory[instructionPointer] % 100
+        loop@ while(readOpcode(instructionPointer) != OP_HALT) {
             val paramModes = sharedMemory[instructionPointer] / 100
 
-            when(opcode) {
+            when(readOpcode(instructionPointer)) {
                 OP_ADD -> {
-                    val firstOperandPosition = if (paramModes / 10.0.pow(1-1).toInt() % 10 == 0) {
-                        sharedMemory[instructionPointer + 1]
-                    } else {
-                        instructionPointer + 1
-                    }
-                    val firstOperand = sharedMemory[firstOperandPosition]
+                    val firstOperand = readParam(1, instructionPointer)
+                    val secondOperand = readParam(2, instructionPointer)
 
-                    val secondOperandPosition = if (paramModes / 10.0.pow(2-1).toInt() % 10 == 0) {
-                        sharedMemory[instructionPointer + 2]
-                    } else {
-                        instructionPointer + 2
-                    }
-                    val secondOperand = sharedMemory[secondOperandPosition]
-
+                    // TODO: Can this case be handled as standard parameter with omitted leading 0?
                     resultAddress = sharedMemory[instructionPointer + 3]
                     instructionPointer += 4
 
                     sharedMemory[resultAddress] = firstOperand + secondOperand
                 }
                 OP_MULT -> {
-                    val firstOperandPosition = if (paramModes / 10.0.pow(1-1).toInt() % 10 == 0) {
-                        sharedMemory[instructionPointer + 1]
-                    } else {
-                        instructionPointer + 1
-                    }
-                    val firstOperand = sharedMemory[firstOperandPosition]
-
-                    val secondOperandPosition = if (paramModes / 10.0.pow(2-1).toInt() % 10 == 0) {
-                        sharedMemory[instructionPointer + 2]
-                    } else {
-                        instructionPointer + 2
-                    }
-                    val secondOperand = sharedMemory[secondOperandPosition]
+                    val firstOperand = readParam(1, instructionPointer)
+                    val secondOperand = readParam(2, instructionPointer)
 
                     resultAddress = sharedMemory[instructionPointer + 3]
                     instructionPointer += 4
@@ -82,12 +73,7 @@ class IntcodeComputer(initialMemory: List<Int>) {
                     sharedMemory[resultAddress] = inputBuffer.poll()
                 }
                 OP_OUTPUT -> {
-                    val firstOperandPosition = if (paramModes / 10.0.pow(1-1).toInt() % 10 == 0) {
-                        sharedMemory[instructionPointer + 1]
-                    } else {
-                        instructionPointer + 1
-                    }
-                    val firstOperand = sharedMemory[firstOperandPosition]
+                    val firstOperand = readParam(1, instructionPointer)
                     instructionPointer += 2
 
                     outputBuffer.add(firstOperand)
