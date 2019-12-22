@@ -48,16 +48,16 @@ class IntcodeComputer(initialMemory: List<Int>) {
         loop@ while(true) {
             when(readOpcode()) {
                 OP_ADD -> {
-                    val firstOperand = readValue(1)
-                    val secondOperand = readValue(2)
-                    writeValue(3, firstOperand + secondOperand)
+                    val first = readValue(1)
+                    val second = readValue(2)
+                    writeValue(3, first + second)
 
                     instructionPointer += 4
                 }
                 OP_MULT -> {
-                    val firstOperand = readValue(1)
-                    val secondOperand = readValue(2)
-                    writeValue(3, firstOperand * secondOperand)
+                    val first = readValue(1)
+                    val second = readValue(2)
+                    writeValue(3, first * second)
 
                     instructionPointer += 4
                 }
@@ -67,7 +67,9 @@ class IntcodeComputer(initialMemory: List<Int>) {
                     instructionPointer += 2
                 }
                 OP_OUTPUT -> {
-                    val firstOperand = readValue(1)
+                    val first = readValue(1)
+                    outputBuffer.add(first)
+
                     instructionPointer += 2
 
                     outputBuffer.add(firstOperand)
@@ -86,5 +88,6 @@ class IntcodeComputer(initialMemory: List<Int>) {
         const val OP_MULT = 2
         const val OP_INPUT = 3
         const val OP_OUTPUT = 4
+        const val OP_JUMP_IF_TRUE = 5
     }
 }
