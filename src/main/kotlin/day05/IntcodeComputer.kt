@@ -32,14 +32,14 @@ class IntcodeComputer {
 
             when(opcode) {
                 OP_ADD -> {
-                    val firstOperandPosition = if (paramModes / 10.0.pow(1-1).toInt() == 0) {
+                    val firstOperandPosition = if (paramModes / 10.0.pow(1-1).toInt() % 10 == 0) {
                         memory[instructionPointer + 1]
                     } else {
                         instructionPointer + 1
                     }
                     val firstOperand = memory[firstOperandPosition]
 
-                    val secondOperandPosition = if (paramModes / 10.0.pow(2-1).toInt() == 0) {
+                    val secondOperandPosition = if (paramModes / 10.0.pow(2-1).toInt() % 10 == 0) {
                         memory[instructionPointer + 2]
                     } else {
                         instructionPointer + 2
@@ -52,14 +52,14 @@ class IntcodeComputer {
                     memory[resultAddress] = firstOperand + secondOperand
                 }
                 OP_MULT -> {
-                    val firstOperandPosition = if (paramModes / 10.0.pow(1-1).toInt() == 0) {
+                    val firstOperandPosition = if (paramModes / 10.0.pow(1-1).toInt() % 10 == 0) {
                         memory[instructionPointer + 1]
                     } else {
                         instructionPointer + 1
                     }
                     val firstOperand = memory[firstOperandPosition]
 
-                    val secondOperandPosition = if (paramModes / 10.0.pow(2-1).toInt() == 0) {
+                    val secondOperandPosition = if (paramModes / 10.0.pow(2-1).toInt() % 10 == 0) {
                         memory[instructionPointer + 2]
                     } else {
                         instructionPointer + 2
@@ -72,7 +72,7 @@ class IntcodeComputer {
                     memory[resultAddress] = firstOperand * secondOperand
                 }
                 OP_INPUT -> {
-                    resultAddress = if (paramModes / 10.0.pow(1-1).toInt() == 0) {
+                    resultAddress = if (paramModes / 10.0.pow(1-1).toInt() % 10 == 0) {
                         memory[instructionPointer + 1]
                     } else {
                         instructionPointer + 1
@@ -83,7 +83,7 @@ class IntcodeComputer {
                     memory[resultAddress] = inputBuffer.poll()
                 }
                 OP_OUTPUT -> {
-                    val firstOperandPosition = if (paramModes / 10.0.pow(1-1).toInt() == 0) {
+                    val firstOperandPosition = if (paramModes / 10.0.pow(1-1).toInt() % 10 == 0) {
                         memory[instructionPointer + 1]
                     } else {
                         instructionPointer + 1

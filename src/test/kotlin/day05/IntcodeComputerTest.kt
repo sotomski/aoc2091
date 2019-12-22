@@ -26,11 +26,11 @@ class IntcodeComputerTest {
 
     @Test
     fun `ADD in immediate mode`() {
-        val opcode = ADD + 100 + 1000
+        val opcode = ADD + 1000
 
         assertEquals(
-            8,
-            IntcodeComputer().execute(listOf(opcode, 5, 3, 0, 99))
+            1008,
+            IntcodeComputer().execute(listOf(opcode, 0, 7, 0, 99))
         )
     }
 
