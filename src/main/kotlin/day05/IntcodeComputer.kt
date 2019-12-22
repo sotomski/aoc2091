@@ -71,8 +71,16 @@ class IntcodeComputer(initialMemory: List<Int>) {
                     outputBuffer.add(first)
 
                     instructionPointer += 2
+                }
+                OP_JUMP_IF_TRUE -> {
+                    val first = readValue(1)
+                    val second = readValue(2)
 
-                    outputBuffer.add(firstOperand)
+                    instructionPointer = if (first != 0) {
+                        second
+                    } else {
+                        instructionPointer + 3
+                    }
                 }
                 OP_HALT -> break@loop
                 else -> throw UnsupportedOperationException()

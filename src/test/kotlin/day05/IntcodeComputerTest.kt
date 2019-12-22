@@ -9,6 +9,7 @@ private const val ADD = 1
 private const val MULT = 2
 private const val INPUT = 3
 private const val OUTPUT = 4
+private const val JUMP_IF_TRUE = 5
 
 class IntcodeComputerTest {
 
@@ -104,5 +105,12 @@ class IntcodeComputerTest {
         }
 
         assertEquals(-57, computer.output().last())
+    }
+
+    @Test
+    fun `JUMP-IF-TRUE operation`() {
+        val computer = IntcodeComputer(listOf(JUMP_IF_TRUE, 1, 3, 4, 99))
+
+        assertEquals(JUMP_IF_TRUE, computer.execute())
     }
 }
