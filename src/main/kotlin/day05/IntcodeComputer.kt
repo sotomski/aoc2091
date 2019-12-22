@@ -30,43 +30,41 @@ class IntcodeComputer(initialMemory: List<Int>) {
         return sharedMemory[valueAddress]
     }
 
+    private fun writeValue(offset: Int, value: Int) {
+        val paramModes = sharedMemory[instructionPointer] / 100
+        val valueAddress = if (paramModes / 10.0.pow(offset - 1).toInt() % 10 == 0) {
+            sharedMemory[instructionPointer + offset]
+        } else {
+            instructionPointer + offset
+        }
+
+        sharedMemory[valueAddress] = value
+    }
+
     fun execute(noun: Int? = null, verb: Int? = null): Int {
         noun?.let { sharedMemory[1] = it }
         verb?.let { sharedMemory[2] = it }
-
-        var resultAddress = 0
 
         loop@ while(true) {
             when(readOpcode()) {
                 OP_ADD -> {
                     val firstOperand = readValue(1)
                     val secondOperand = readValue(2)
+                    writeValue(3, firstOperand + secondOperand)
 
-                    // TODO: Can this case be handled as standard parameter with omitted leading 0?
-                    resultAddress = sharedMemory[instructionPointer + 3]
                     instructionPointer += 4
-
-                    sharedMemory[resultAddress] = firstOperand + secondOperand
                 }
                 OP_MULT -> {
                     val firstOperand = readValue(1)
                     val secondOperand = readValue(2)
+                    writeValue(3, firstOperand * secondOperand)
 
-                    resultAddress = sharedMemory[instructionPointer + 3]
                     instructionPointer += 4
-
-                    sharedMemory[resultAddress] = firstOperand * secondOperand
                 }
                 OP_INPUT -> {
-                    resultAddress = if (paramModes / 10.0.pow(1-1).toInt() % 10 == 0) {
-                        sharedMemory[instructionPointer + 1]
-                    } else {
-                        instructionPointer + 1
-                    }
+                    writeValue(1, inputBuffer.poll())
 
                     instructionPointer += 2
-
-                    sharedMemory[resultAddress] = inputBuffer.poll()
                 }
                 OP_OUTPUT -> {
                     val firstOperand = readValue(1)
