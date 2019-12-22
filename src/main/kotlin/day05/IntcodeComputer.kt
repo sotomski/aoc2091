@@ -6,6 +6,9 @@ import kotlin.collections.ArrayList
 class IntcodeComputer {
 
     private val inputBuffer: Queue<Int> = ArrayDeque()
+    private val outputBuffer = mutableListOf<Int>()
+
+    fun output() = outputBuffer.toList()
 
     fun registerInput(value: Int) {
         inputBuffer.add(value)
@@ -48,6 +51,16 @@ class IntcodeComputer {
 
                     inputBuffer.poll()
                 }
+                OP_OUTPUT -> {
+                    val firstOperand = memory[memory[instructionPointer + 1]]
+                    resultAddress = memory[instructionPointer + 1]
+                    instructionPointer += 2
+
+                    outputBuffer.add(firstOperand)
+
+                    firstOperand
+
+                }
                 OP_HALT -> break@loop
                 else -> throw UnsupportedOperationException()
             }
@@ -63,5 +76,6 @@ class IntcodeComputer {
         const val OP_ADD = 1
         const val OP_MULT = 2
         const val OP_INPUT = 3
+        const val OP_OUTPUT = 4
     }
 }

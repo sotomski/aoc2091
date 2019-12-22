@@ -8,6 +8,7 @@ import kotlin.math.pow
 private const val ADD = 1
 private const val MULT = 2
 private const val INPUT = 3
+private const val OUTPUT = 4
 
 class IntcodeComputerTest {
 
@@ -45,19 +46,15 @@ class IntcodeComputerTest {
         assertEquals(    42, got)
     }
 
-    // TODO: OUTPUT
-
-    // TODO: immediate mode
-
     @Test
-    fun `combine all operations`() {
-        // (5(input) + 1) * 2
-        val initialMemory = listOf(INPUT, 0, ADD, 0, 2, 0, MULT, 0, 6, 0, 99)
+    fun `OUTPUT operation`() {
         val computer = IntcodeComputer()
 
-        computer.registerInput(5)
-        val got = computer.execute(initialMemory)
+        computer.registerInput(42)
+        computer.execute(listOf(INPUT, 0, OUTPUT, 0, 99))
 
-        assertEquals(12, got)
+        assertEquals(42, computer.output().last())
     }
+
+    // TODO: immediate mode
 }
