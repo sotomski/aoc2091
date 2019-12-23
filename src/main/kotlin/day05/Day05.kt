@@ -5,6 +5,20 @@ fun main() {
 
     val initialMemory = rawInput.split(',').map { it.toInt() }
 
+    part1(initialMemory)
+
+    part2(initialMemory)
+}
+
+fun part2(initialMemory: List<Int>) {
+    val computer = IntcodeComputer(initialMemory)
+    computer.registerInput(5)
+    computer.execute()
+
+    println("Part 2: Computer output: ${computer.output()}")
+}
+
+private fun part1(initialMemory: List<Int>) {
     val computer = IntcodeComputer(initialMemory)
     computer.registerInput(1)
     computer.execute()

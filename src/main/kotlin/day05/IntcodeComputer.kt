@@ -95,7 +95,14 @@ class IntcodeComputer(initialMemory: List<Int>) {
                 OP_LESS_THAN -> {
                     val first = readValue(1)
                     val second = readValue(2)
-                    writeValue(3, if (first < second) 0 else 1)
+                    writeValue(3, if (first < second) 1 else 0)
+
+                    instructionPointer += 4
+                }
+                OP_EQUALS -> {
+                    val first = readValue(1)
+                    val second = readValue(2)
+                    writeValue(3, if (first == second) 1 else 0)
 
                     instructionPointer += 4
                 }
@@ -116,5 +123,6 @@ class IntcodeComputer(initialMemory: List<Int>) {
         const val OP_JUMP_IF_TRUE = 5
         const val OP_JUMP_IF_FALSE = 6
         const val OP_LESS_THAN = 7
+        const val OP_EQUALS = 8
     }
 }
