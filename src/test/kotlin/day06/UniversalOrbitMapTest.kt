@@ -47,4 +47,44 @@ class UniversalOrbitMapTest {
             UniversalOrbitMap(inputOrbits).checksum()
         )
     }
+
+    @Test
+    fun `shortestRouteBetween should return empty route when system is trivial`() {
+        val inputOrbits = listOf("COM)A")
+
+        assertEquals(
+            emptyList<Int>(),
+            UniversalOrbitMap(inputOrbits).shortestRouteBetween("COM", "A")
+        )
+    }
+
+    @Test
+    fun `shortestRouteBetween should find the route when the orbit system is single-child-only`() {
+        val inputOrbits = listOf("COM)A", "A)B", "B)C", "C)D")
+
+        assertEquals(
+            listOf("B", "C"),
+            UniversalOrbitMap(inputOrbits).shortestRouteBetween("A", "D")
+        )
+    }
+
+    @Test
+    fun `shortestRouteBetween should be empty when endpoints orbit the same object`() {
+        val inputOrbits = listOf("COM)A", "A)B", "A)C", "A)D")
+
+        assertEquals(
+            emptyList<Int>(),
+            UniversalOrbitMap(inputOrbits).shortestRouteBetween("B", "D")
+        )
+    }
+
+    @Test
+    fun `shortestRouteBetween should find a route through the common center of orbiting objects`() {
+        val inputOrbits = listOf("COM)B", "B)C", "C)D", "D)E", "E)F", "B)G", "G)H", "D)I", "E)J", "J)K", "K)L", "K)YOU", "I)SAN")
+
+        assertEquals(
+            listOf("K", "J", "E", "D", "I"),
+            UniversalOrbitMap(inputOrbits).shortestRouteBetween("YOU", "SAN")
+        )
+    }
 }

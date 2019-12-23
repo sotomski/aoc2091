@@ -4,6 +4,10 @@ fun main() {
     val map = UniversalOrbitMap(rawInput.lines())
 
     println("Part 1: Map checksum: ${map.checksum()}")
+
+    val route = map.shortestRouteBetween("YOU", "SAN")
+    println("Part 2: Shortest route between YOU and SAN is: $route")
+    println("Path 2: Count of orbital transfers on the route: ${route.count()-1}")
 }
 
 private val rawInput = """
