@@ -11,6 +11,7 @@ private const val INPUT = 3
 private const val OUTPUT = 4
 private const val JUMP_IF_TRUE = 5
 private const val JUMP_IF_FALSE = 6
+private const val LESS_THAN = 7
 
 class IntcodeComputerTest {
 
@@ -138,5 +139,23 @@ class IntcodeComputerTest {
         val computer = IntcodeComputer(listOf(opcode, 1, 44444, 99))
 
         assertEquals(opcode, computer.execute())
+    }
+    
+    @Test
+    fun `LESS-THAN operation`() {
+        assertEquals(
+            0,
+            IntcodeComputer(listOf(LESS_THAN + 1100, 4, 5, 0, 99)).execute()
+        )
+
+        assertEquals(
+            1,
+            IntcodeComputer(listOf(LESS_THAN + 1100, 5, 4, 0, 99)).execute()
+        )
+
+        assertEquals(
+            1,
+            IntcodeComputer(listOf(LESS_THAN + 1100, 4, 4, 0, 99)).execute()
+        )
     }
 }

@@ -92,6 +92,13 @@ class IntcodeComputer(initialMemory: List<Int>) {
                         instructionPointer + 3
                     }
                 }
+                OP_LESS_THAN -> {
+                    val first = readValue(1)
+                    val second = readValue(2)
+                    writeValue(3, if (first < second) 0 else 1)
+
+                    instructionPointer += 4
+                }
                 OP_HALT -> break@loop
                 else -> throw UnsupportedOperationException()
             }
@@ -108,5 +115,6 @@ class IntcodeComputer(initialMemory: List<Int>) {
         const val OP_OUTPUT = 4
         const val OP_JUMP_IF_TRUE = 5
         const val OP_JUMP_IF_FALSE = 6
+        const val OP_LESS_THAN = 7
     }
 }
