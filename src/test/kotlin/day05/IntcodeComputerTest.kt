@@ -1,18 +1,16 @@
 package day05
 
+import ADD
+import EQUALS
+import INPUT
+import JUMP_IF_FALSE
+import JUMP_IF_TRUE
+import LESS_THAN
+import MULT
+import OUTPUT
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import kotlin.math.pow
-
-// Following is meant to improve test readability
-private const val ADD = 1
-private const val MULT = 2
-private const val INPUT = 3
-private const val OUTPUT = 4
-private const val JUMP_IF_TRUE = 5
-private const val JUMP_IF_FALSE = 6
-private const val LESS_THAN = 7
-private const val EQUALS = 8
 
 class IntcodeComputerTest {
 
