@@ -51,7 +51,15 @@ class AmplificationCircuitTest {
         )
     }
 
-    // TODO: Test drive the feedback
+    @Test
+    fun `thrusterSignalWithFeedback should use phase setting as first input`() {
+        val circuit = AmplificationCircuit(
+            listOf(INPUT + 100, 1, INPUT + 100, 3, OUTPUT, 1, INPUT + 100, 7, 99)
+        )
+
+        assertEquals(42, circuit.thrusterSignalWithFeedback(listOf(42)))
+    }
+
 
 
     // TODO: Put the examples here as well to prove the overall correctness of the algorithm.

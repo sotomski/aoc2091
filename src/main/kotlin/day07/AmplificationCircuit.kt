@@ -27,19 +27,19 @@ class AmplificationCircuit(private val program: List<Int>) {
     fun thrusterSignalWithFeedback(phases: List<Int>): Int {
         var signal = 0
 
-//        val computers = (0 until phases.count()).map { phaseIdx ->
-//            IntcodeComputer(ArrayList(program)).apply {
-//                registerInput(phases[phaseIdx])
-//            }
-//        }
-//
+        val computers = (0 until phases.count()).map { phaseIdx ->
+            IntcodeComputer(ArrayList(program)).apply {
+                registerInput(phases[phaseIdx])
+            }
+        }
+
 //        // TODO: While the last computer is still running...
 //        while(true) {
-//            for(computer in computers) {
-//                computer.registerInput(signal) // TODO: Input should automatically resume a paused program.
-//                computer.execute() // TODO: Only if it's not running?
-//                signal = computer.output().last() // TODO: By now, the computer should again be paused.
-//            }
+            for(computer in computers) {
+                computer.registerInput(signal) // TODO: Input should automatically resume a paused program.
+                computer.execute() // TODO: Only if it's not running?
+                signal = computer.output().last() // TODO: By now, the computer should again be paused.
+            }
 //        }
 
         return signal

@@ -11,10 +11,17 @@ class IntcodeComputer(initialMemory: List<Int>) {
     private val inputBuffer: Queue<Int> = ArrayDeque()
     private val outputBuffer = mutableListOf<Int>()
 
+    private var isWaitingForInput = false
+
     fun output() = outputBuffer.toList()
 
     fun registerInput(value: Int) {
         inputBuffer.add(value)
+
+        if (isWaitingForInput) {
+            isWaitingForInput = false
+            runInstructions()
+        }
     }
 
     private fun readOpcode() = sharedMemory[instructionPointer] % 100
@@ -45,6 +52,10 @@ class IntcodeComputer(initialMemory: List<Int>) {
         noun?.let { sharedMemory[1] = it }
         verb?.let { sharedMemory[2] = it }
 
+        return runInstructions()
+    }
+
+    private fun runInstructions(): Int {
         loop@ while(true) {
             when(readOpcode()) {
                 OP_ADD -> {
@@ -62,6 +73,11 @@ class IntcodeComputer(initialMemory: List<Int>) {
                     instructionPointer += 4
                 }
                 OP_INPUT -> {
+                    if (inputBuffer.peek() == null) {
+                        isWaitingForInput = true
+                        break@loop
+                    }
+
                     writeValue(1, inputBuffer.poll())
 
                     instructionPointer += 2
@@ -106,12 +122,14 @@ class IntcodeComputer(initialMemory: List<Int>) {
 
                     instructionPointer += 4
                 }
-                OP_HALT -> break@loop
+                OP_HALT -> {
+                    return sharedMemory[0]
+                }
                 else -> throw UnsupportedOperationException()
             }
         }
 
-        return sharedMemory[0]
+        return Int.MIN_VALUE
     }
 
     companion object {

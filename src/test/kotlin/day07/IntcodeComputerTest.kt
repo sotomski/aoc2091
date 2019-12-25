@@ -90,6 +90,17 @@ class IntcodeComputerTest {
     }
 
     @Test
+    fun `INPUT should pause execution and wait for a value when non present`() {
+        val computer = IntcodeComputer(listOf(INPUT + 100, 0, OUTPUT, 1, 99))
+
+        computer.execute()
+        computer.registerInput(42)
+        val got = computer.output().last()
+
+        assertEquals(    42, got)
+    }
+
+    @Test
     fun `OUTPUT operation`() {
         val computer = IntcodeComputer(listOf(INPUT, 0, OUTPUT, 0, 99))
 
