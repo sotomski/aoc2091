@@ -5,7 +5,7 @@ fun main() {
     val program = rawInput.split(',').map { it.toInt() }
 
     val circuit = AmplificationCircuit(program)
-    val optimalPhases = circuit.findOptimalPhaseSetting(5)
+    val optimalPhases = circuit.findOptimalPhaseSetting()
 
     println("Part 1: Optimal phase settings: $optimalPhases")
     println("Part 2: Signal for optimal settings: ${circuit.thrusterSignal(optimalPhases)}")
