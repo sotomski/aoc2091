@@ -7,7 +7,7 @@ import kotlin.math.pow
 
 class IntcodeComputer(initialMemory: List<Int>) {
 
-    private val sharedMemory = mutableListOf(*initialMemory.toTypedArray())
+    private val sharedMemory = ExpandableMemory(initialMemory)
     private var instructionPointer = 0
     private var relativeBase = 0
 
@@ -181,6 +181,28 @@ class IntcodeComputer(initialMemory: List<Int>) {
                 } catch (e: Exception) {
                     throw IllegalArgumentException("Unknown value", e)
                 }
+            }
+        }
+    }
+
+    private class ExpandableMemory(initialMemory: List<Int>) {
+        private val memory = mutableListOf(*initialMemory.toTypedArray())
+
+        operator fun get(index: Int): Int {
+            ensureMemoryLargeEnough(index)
+
+            return memory[index]
+        }
+
+        operator fun set(index: Int, value: Int) {
+            ensureMemoryLargeEnough(index)
+
+            memory[index] = value
+        }
+
+        private fun ensureMemoryLargeEnough(index: Int) {
+            if (index >= memory.count()) {
+                memory += List(index - memory.count() + 1) { 0 }
             }
         }
     }

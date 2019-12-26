@@ -212,4 +212,19 @@ class IntcodeComputerTest {
         assertFalse(computer.isExecutionInProgress)
         assertEquals(listOf(HALT), computer.output())
     }
+
+    @Test
+    fun `memory should accommodate any index`() {
+        val memoryHog = listOf(
+            INPUT, 100000,
+            OUTPUT, 100000,
+            HALT)
+        val computer = IntcodeComputer(memoryHog)
+
+        computer.registerInput(42)
+        computer.execute()
+
+        assertFalse(computer.isExecutionInProgress)
+        assertEquals(listOf(42), computer.output())
+    }
 }
