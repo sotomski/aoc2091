@@ -1,5 +1,6 @@
 package day09
 
+import day09.IntcodeComputer.Instruction.*
 import day09.IntcodeComputer.ParameterMode.*
 import java.util.*
 import kotlin.math.pow
@@ -29,7 +30,10 @@ class IntcodeComputer(initialMemory: List<Int>) {
         }
     }
 
-    private fun readOpcode() = sharedMemory[instructionPointer] % 100
+    private fun readOpcode(): Instruction {
+        val intCode = sharedMemory[instructionPointer] % 100
+        return Instruction.fromCode(intCode)
+    }
 
     private fun readValue(offset: Int): Int {
         val address = valueAddress(offset)
@@ -42,9 +46,9 @@ class IntcodeComputer(initialMemory: List<Int>) {
     }
 
     private fun valueAddress(offset: Int): Int = when (modeOfParameter(offset)) {
-        Positional -> sharedMemory[instructionPointer + offset]
-        Immediate -> instructionPointer + offset
-        Relative -> sharedMemory[relativeBase + offset]
+        POSITIONAL -> sharedMemory[instructionPointer + offset]
+        IMMEDIATE -> instructionPointer + offset
+        RELATIVE -> sharedMemory[relativeBase + offset]
     }
 
     private fun modeOfParameter(offset: Int): ParameterMode {
@@ -65,21 +69,21 @@ class IntcodeComputer(initialMemory: List<Int>) {
     private fun runInstructions(): Int {
         loop@ while (true) {
             when (readOpcode()) {
-                OP_ADD -> {
+                ADD -> {
                     val first = readValue(1)
                     val second = readValue(2)
                     writeValue(3, first + second)
 
                     instructionPointer += 4
                 }
-                OP_MULT -> {
+                MULTIPLY -> {
                     val first = readValue(1)
                     val second = readValue(2)
                     writeValue(3, first * second)
 
                     instructionPointer += 4
                 }
-                OP_INPUT -> {
+                INPUT -> {
                     if (inputBuffer.peek() == null) {
                         state = ExecutionState.WaitingForInput
                         break@loop
@@ -89,13 +93,13 @@ class IntcodeComputer(initialMemory: List<Int>) {
 
                     instructionPointer += 2
                 }
-                OP_OUTPUT -> {
+                OUTPUT -> {
                     val first = readValue(1)
                     outputBuffer.add(first)
 
                     instructionPointer += 2
                 }
-                OP_JUMP_IF_TRUE -> {
+                JUMP_IF_TRUE -> {
                     val first = readValue(1)
                     val second = readValue(2)
 
@@ -105,7 +109,7 @@ class IntcodeComputer(initialMemory: List<Int>) {
                         instructionPointer + 3
                     }
                 }
-                OP_JUMP_IF_FALSE -> {
+                JUMP_IF_FALSE -> {
                     val first = readValue(1)
                     val second = readValue(2)
 
@@ -115,57 +119,51 @@ class IntcodeComputer(initialMemory: List<Int>) {
                         instructionPointer + 3
                     }
                 }
-                OP_LESS_THAN -> {
+                LESS_THAN -> {
                     val first = readValue(1)
                     val second = readValue(2)
                     writeValue(3, if (first < second) 1 else 0)
 
                     instructionPointer += 4
                 }
-                OP_EQUALS -> {
+                EQUALS -> {
                     val first = readValue(1)
                     val second = readValue(2)
                     writeValue(3, if (first == second) 1 else 0)
 
                     instructionPointer += 4
                 }
-                OP_INCREMENT_RELATIVE_BASE -> {
+                INCREMENT_RELATIVE_BASE -> {
                     relativeBase += readValue(1)
 
                     instructionPointer += 2
                 }
-                OP_HALT -> {
+                HALT -> {
                     state = ExecutionState.NotRunning
                     return sharedMemory[0]
                 }
-                else -> throw UnsupportedOperationException()
             }
         }
 
         return Int.MIN_VALUE
     }
 
-    companion object {
-        const val OP_HALT = 99
-        const val OP_ADD = 1
-        const val OP_MULT = 2
-        const val OP_INPUT = 3
-        const val OP_OUTPUT = 4
-        const val OP_JUMP_IF_TRUE = 5
-        const val OP_JUMP_IF_FALSE = 6
-        const val OP_LESS_THAN = 7
-        const val OP_EQUALS = 8
-        const val OP_INCREMENT_RELATIVE_BASE = 9
-
-    }
-
-    private enum class Instruction {
-        Halt, Add, Multiply, Input, Output, JumpIfTrue, JumpIfFalse, LessThan, Equals, IncrementRelativeBase;
+    private enum class Instruction(val code: Int) {
+        HALT(99),
+        ADD(1),
+        MULTIPLY(2),
+        INPUT(3),
+        OUTPUT(4),
+        JUMP_IF_TRUE(5),
+        JUMP_IF_FALSE(6),
+        LESS_THAN(7),
+        EQUALS(8),
+        INCREMENT_RELATIVE_BASE(9);
 
         companion object {
-            fun fromOrdinal(ordinal: Int): Instruction {
+            fun fromCode(code: Int): Instruction {
                 return try {
-                    values().first { it.ordinal == ordinal}
+                    values().first { it.code == code }
                 } catch (e: Exception) {
                     throw IllegalArgumentException("Unknown value", e)
                 }
@@ -174,12 +172,12 @@ class IntcodeComputer(initialMemory: List<Int>) {
     }
 
     private enum class ParameterMode {
-        Positional, Immediate, Relative;
+        POSITIONAL, IMMEDIATE, RELATIVE;
 
         companion object {
             fun fromOrdinal(ordinal: Int): ParameterMode {
                 return try {
-                    values().first { it.ordinal == ordinal}
+                    values().first { it.ordinal == ordinal }
                 } catch (e: Exception) {
                     throw IllegalArgumentException("Unknown value", e)
                 }
