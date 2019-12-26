@@ -8,3 +8,4 @@ const val JUMP_IF_TRUE = 5
 const val JUMP_IF_FALSE = 6
 const val LESS_THAN = 7
 const val EQUALS = 8
+const val INC_REL_BASE = 9
