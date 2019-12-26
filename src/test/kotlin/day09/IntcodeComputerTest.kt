@@ -209,7 +209,6 @@ class IntcodeComputerTest {
 
         computer.execute()
 
-        assertFalse(computer.isExecutionInProgress)
         assertEquals(listOf(HALT), computer.output())
     }
 
@@ -224,7 +223,16 @@ class IntcodeComputerTest {
         computer.registerInput(42)
         computer.execute()
 
-        assertFalse(computer.isExecutionInProgress)
         assertEquals(listOf(42), computer.output())
+    }
+
+    @Test
+    fun `should pass test programs`() {
+        val selfCopier = listOf(109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99)
+        val computer = IntcodeComputer(selfCopier)
+        computer.execute()
+
+        assertFalse(computer.isExecutionInProgress)
+        assertEquals(selfCopier, computer.output())
     }
 }
