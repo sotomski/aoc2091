@@ -201,18 +201,15 @@ class IntcodeComputerTest {
 
     @Test
     fun `should support relative parameter mode`() {
-        val selfCopier = listOf(
-            INC_REL_BASE+100,1,
-            OUTPUT+200,-1,
-            ADD+1000,100,1,100,
-            EQUALS+1000,100,16,101,
-            JUMP_IF_FALSE+1000,101,0,
+        val haltPrinter = listOf(
+            INC_REL_BASE+100,4,
+            OUTPUT+200,0,
             HALT)
-        val computer = IntcodeComputer(selfCopier)
+        val computer = IntcodeComputer(haltPrinter)
 
         computer.execute()
 
         assertFalse(computer.isExecutionInProgress)
-        assertEquals(selfCopier, computer.output())
+        assertEquals(listOf(HALT), computer.output())
     }
 }

@@ -48,7 +48,7 @@ class IntcodeComputer(initialMemory: List<Int>) {
     private fun valueAddress(offset: Int): Int = when (modeOfParameter(offset)) {
         POSITIONAL -> sharedMemory[instructionPointer + offset]
         IMMEDIATE -> instructionPointer + offset
-        RELATIVE -> sharedMemory[relativeBase + offset]
+        RELATIVE -> relativeBase + sharedMemory[instructionPointer + offset]
     }
 
     private fun modeOfParameter(offset: Int): ParameterMode {
