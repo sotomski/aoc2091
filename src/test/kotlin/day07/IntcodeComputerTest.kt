@@ -8,7 +8,7 @@ import JUMP_IF_TRUE
 import LESS_THAN
 import MULT
 import OUTPUT
-import org.junit.Assert.assertEquals
+import org.junit.Assert.*
 import org.junit.Test
 import kotlin.math.pow
 
@@ -84,17 +84,6 @@ class IntcodeComputerTest {
 
         computer.registerInput(42)
         computer.execute()
-        val got = computer.output().last()
-
-        assertEquals(    42, got)
-    }
-
-    @Test
-    fun `INPUT should pause execution and wait for a value when non present`() {
-        val computer = IntcodeComputer(listOf(INPUT + 100, 0, OUTPUT, 1, 99))
-
-        computer.execute()
-        computer.registerInput(42)
         val got = computer.output().last()
 
         assertEquals(    42, got)
@@ -180,5 +169,31 @@ class IntcodeComputerTest {
             0,
             IntcodeComputer(listOf(EQUALS + 1000, 4, 4555, 0, 99)).execute()
         )
+    }
+
+    @Test
+    fun `INPUT should pause execution and wait for a value when non present`() {
+        val computer = IntcodeComputer(listOf(INPUT + 100, 0, OUTPUT, 1, 99))
+
+        computer.execute()
+        computer.registerInput(42)
+        val got = computer.output().last()
+
+        assertEquals(    42, got)
+    }
+
+    @Test
+    fun `should indicate when program's execution is in progress`() {
+        val computer = IntcodeComputer(listOf(INPUT + 100, 0, OUTPUT, 1, 99))
+
+        val beforeExecution = computer.isExecutionInProgress
+        computer.execute()
+        val duringExecution = computer.isExecutionInProgress
+        computer.registerInput(42)
+        val afterExecution = computer.isExecutionInProgress
+
+        assertFalse(beforeExecution)
+        assertTrue(duringExecution)
+        assertFalse(afterExecution)
     }
 }

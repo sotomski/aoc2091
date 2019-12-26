@@ -1,4 +1,5 @@
 // Following is meant to improve test readability
+const val HALT = 99
 const val ADD = 1
 const val MULT = 2
 const val INPUT = 3

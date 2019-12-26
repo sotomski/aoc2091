@@ -11,15 +11,17 @@ class IntcodeComputer(initialMemory: List<Int>) {
     private val inputBuffer: Queue<Int> = ArrayDeque()
     private val outputBuffer = mutableListOf<Int>()
 
-    private var isWaitingForInput = false
+    private enum class ExecutionState { NotRunning, InProgress, WaitingForInput }
+    private var state = ExecutionState.NotRunning
+    val isExecutionInProgress get() = state != ExecutionState.NotRunning
 
     fun output() = outputBuffer.toList()
 
     fun registerInput(value: Int) {
         inputBuffer.add(value)
 
-        if (isWaitingForInput) {
-            isWaitingForInput = false
+        if (state == ExecutionState.WaitingForInput) {
+            state = ExecutionState.InProgress
             runInstructions()
         }
     }
@@ -52,6 +54,8 @@ class IntcodeComputer(initialMemory: List<Int>) {
         noun?.let { sharedMemory[1] = it }
         verb?.let { sharedMemory[2] = it }
 
+        state = ExecutionState.InProgress
+
         return runInstructions()
     }
 
@@ -74,7 +78,7 @@ class IntcodeComputer(initialMemory: List<Int>) {
                 }
                 OP_INPUT -> {
                     if (inputBuffer.peek() == null) {
-                        isWaitingForInput = true
+                        state = ExecutionState.WaitingForInput
                         break@loop
                     }
 
@@ -123,6 +127,7 @@ class IntcodeComputer(initialMemory: List<Int>) {
                     instructionPointer += 4
                 }
                 OP_HALT -> {
+                    state = ExecutionState.NotRunning
                     return sharedMemory[0]
                 }
                 else -> throw UnsupportedOperationException()
