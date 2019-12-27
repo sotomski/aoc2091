@@ -1,18 +1,19 @@
 package day09
 
-import ADD
-import EQUALS
-import HALT
-import INC_REL_BASE
-import INPUT
-import JUMP_IF_FALSE
-import JUMP_IF_TRUE
-import LESS_THAN
-import MULT
-import OUTPUT
 import org.junit.Assert.*
 import org.junit.Test
 import kotlin.math.pow
+
+private const val HALT = 99L
+private const val ADD = 1L
+private const val MULT = 2L
+private const val INPUT = 3L
+private const val OUTPUT = 4L
+private const val JUMP_IF_TRUE = 5L
+private const val JUMP_IF_FALSE = 6L
+private const val LESS_THAN = 7L
+private const val EQUALS = 8L
+private const val INC_REL_BASE = 9L
 
 class IntcodeComputerTest {
 
@@ -45,7 +46,7 @@ class IntcodeComputerTest {
             IntcodeComputer(listOf(MULT, 2, 1, 0, 99)).execute()
         )
         assertEquals(
-            99.0.pow(3.0).toInt(),
+            99.0.pow(3.0).toLong(),
             IntcodeComputer(listOf(MULT, 8, 8, 0, MULT, 0, 8, 0, 99)).execute()
         )
     }
@@ -77,7 +78,7 @@ class IntcodeComputerTest {
         computer.registerInput(42)
         val got = computer.execute()
 
-        assertEquals(    42, got)
+        assertEquals(42, got)
     }
 
     @Test
@@ -88,7 +89,7 @@ class IntcodeComputerTest {
         computer.execute()
         val got = computer.output().last()
 
-        assertEquals(    42, got)
+        assertEquals(42, got)
     }
 
     @Test
@@ -141,7 +142,7 @@ class IntcodeComputerTest {
 
         assertEquals(opcode, computer.execute())
     }
-    
+
     @Test
     fun `LESS-THAN operation`() {
         assertEquals(
@@ -181,7 +182,7 @@ class IntcodeComputerTest {
         computer.registerInput(42)
         val got = computer.output().last()
 
-        assertEquals(    42, got)
+        assertEquals(42, got)
     }
 
     @Test
@@ -202,9 +203,10 @@ class IntcodeComputerTest {
     @Test
     fun `should support relative parameter mode`() {
         val haltPrinter = listOf(
-            INC_REL_BASE+100,4,
-            OUTPUT+200,0,
-            HALT)
+            INC_REL_BASE + 100, 4,
+            OUTPUT + 200, 0,
+            HALT
+        )
         val computer = IntcodeComputer(haltPrinter)
 
         computer.execute()
@@ -217,18 +219,37 @@ class IntcodeComputerTest {
         val memoryHog = listOf(
             INPUT, 100000,
             OUTPUT, 100000,
-            HALT)
+            HALT
+        )
         val computer = IntcodeComputer(memoryHog)
 
         computer.registerInput(42)
         computer.execute()
 
-        assertEquals(listOf(42), computer.output())
+        assertArrayEquals(longArrayOf(42), computer.output().toLongArray())
+    }
+
+    @Test
+    fun `should support large numbers`() {
+        assertEquals(
+            1219070632396864,
+            IntcodeComputer(listOf(1102, 34915192, 34915192, 7, 4, 7, 99, 0)).run {
+                execute()
+                output().last()
+            }
+        )
+        assertEquals(
+            1125899906842624,
+            IntcodeComputer(listOf(104,1125899906842624,99)).run {
+                execute()
+                output().last()
+            }
+        )
     }
 
     @Test
     fun `should pass test programs`() {
-        val selfCopier = listOf(109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99)
+        val selfCopier = listOf(109, 1L, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99)
         val computer = IntcodeComputer(selfCopier)
         computer.execute()
 

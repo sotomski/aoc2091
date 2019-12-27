@@ -5,15 +5,16 @@ import day09.IntcodeComputer.ParameterMode.*
 import java.util.*
 import kotlin.math.pow
 
-class IntcodeComputer(initialMemory: List<Int>) {
+class IntcodeComputer(initialMemory: List<Long>) {
 
     private val sharedMemory = ExpandableMemory(initialMemory)
-    private var instructionPointer = 0
-    private var relativeBase = 0
+    private var instructionPointer = 0L
+    private var relativeBase = 0L
 
-    private val inputBuffer: Queue<Int> = ArrayDeque()
-    private val outputBuffer = mutableListOf<Int>()
+    private val inputBuffer: Queue<Long> = ArrayDeque()
+    private val outputBuffer = mutableListOf<Long>()
 
+    // TODO: Move execution state definition to the end of the file and rename its values.
     private enum class ExecutionState { NotRunning, InProgress, WaitingForInput }
 
     private var state = ExecutionState.NotRunning
@@ -21,7 +22,7 @@ class IntcodeComputer(initialMemory: List<Int>) {
 
     fun output() = outputBuffer.toList()
 
-    fun registerInput(value: Int) {
+    fun registerInput(value: Long) {
         inputBuffer.add(value)
 
         if (state == ExecutionState.WaitingForInput) {
@@ -32,32 +33,32 @@ class IntcodeComputer(initialMemory: List<Int>) {
 
     private fun readOpcode(): Instruction {
         val intCode = sharedMemory[instructionPointer] % 100
-        return Instruction.fromCode(intCode)
+        return Instruction.fromCode(intCode.toInt())
     }
 
-    private fun readValue(offset: Int): Int {
+    private fun readValue(offset: Long): Long {
         val address = valueAddress(offset)
         return sharedMemory[address]
     }
 
-    private fun writeValue(offset: Int, value: Int) {
+    private fun writeValue(offset: Long, value: Long) {
         val address = valueAddress(offset)
         sharedMemory[address] = value
     }
 
-    private fun valueAddress(offset: Int): Int = when (modeOfParameter(offset)) {
+    private fun valueAddress(offset: Long): Long = when (modeOfParameter(offset)) {
         POSITIONAL -> sharedMemory[instructionPointer + offset]
         IMMEDIATE -> instructionPointer + offset
         RELATIVE -> relativeBase + sharedMemory[instructionPointer + offset]
     }
 
-    private fun modeOfParameter(offset: Int): ParameterMode {
+    private fun modeOfParameter(offset: Long): ParameterMode {
         val paramModes = sharedMemory[instructionPointer] / 100
-        val intMode = paramModes / 10.0.pow(offset - 1).toInt() % 10
+        val intMode = (paramModes / 10.0.pow(offset.toInt() - 1) % 10).toInt()
         return ParameterMode.fromOrdinal(intMode)
     }
 
-    fun execute(noun: Int? = null, verb: Int? = null): Int {
+    fun execute(noun: Long? = null, verb: Long? = null): Long {
         noun?.let { sharedMemory[1] = it }
         verb?.let { sharedMemory[2] = it }
 
@@ -66,7 +67,7 @@ class IntcodeComputer(initialMemory: List<Int>) {
         return runInstructions()
     }
 
-    private fun runInstructions(): Int {
+    private fun runInstructions(): Long {
         loop@ while (true) {
             when (readOpcode()) {
                 ADD -> {
@@ -103,7 +104,7 @@ class IntcodeComputer(initialMemory: List<Int>) {
                     val first = readValue(1)
                     val second = readValue(2)
 
-                    instructionPointer = if (first != 0) {
+                    instructionPointer = if (first != 0L) {
                         second
                     } else {
                         instructionPointer + 3
@@ -113,7 +114,7 @@ class IntcodeComputer(initialMemory: List<Int>) {
                     val first = readValue(1)
                     val second = readValue(2)
 
-                    instructionPointer = if (first == 0) {
+                    instructionPointer = if (first == 0L) {
                         second
                     } else {
                         instructionPointer + 3
@@ -145,7 +146,7 @@ class IntcodeComputer(initialMemory: List<Int>) {
             }
         }
 
-        return Int.MIN_VALUE
+        return Long.MIN_VALUE
     }
 
     private enum class Instruction(val code: Int) {
@@ -185,24 +186,24 @@ class IntcodeComputer(initialMemory: List<Int>) {
         }
     }
 
-    private class ExpandableMemory(initialMemory: List<Int>) {
+    private class ExpandableMemory(initialMemory: List<Long>) {
         private val memory = mutableListOf(*initialMemory.toTypedArray())
 
-        operator fun get(index: Int): Int {
-            ensureMemoryLargeEnough(index)
+        operator fun get(index: Long): Long {
+            ensureMemoryLargeEnough(index.toInt())
 
-            return memory[index]
+            return memory[index.toInt()]
         }
 
-        operator fun set(index: Int, value: Int) {
-            ensureMemoryLargeEnough(index)
+        operator fun set(index: Long, value: Long) {
+            ensureMemoryLargeEnough(index.toInt())
 
-            memory[index] = value
+            memory[index.toInt()] = value
         }
 
         private fun ensureMemoryLargeEnough(index: Int) {
             if (index >= memory.count()) {
-                memory += List(index - memory.count() + 1) { 0 }
+                memory += MutableList(index - memory.count() + 1) { 0L }
             }
         }
     }
